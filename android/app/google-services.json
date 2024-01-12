@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "673690686712",
+    "project_id": "musicnotebook-910ca",
+    "storage_bucket": "musicnotebook-910ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673690686712:android:1c4de779a320bfccfb570d",
+        "android_client_info": {
+          "package_name": "com.example.musical_notebook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4g99zSyppryHIFfOWzeO9pbWuxm25Xto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

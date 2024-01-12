@@ -124,6 +124,13 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         // Add new note
         noteController.addNote(_noteController.text);
       }
+
+      // Save composition online
+      saveCompositionOnline(_noteController.text);
     }
+  }
+
+  void saveCompositionOnline(String composition) async {
+    await noteController.saveCompositionOnline(composition);
   }
 }
