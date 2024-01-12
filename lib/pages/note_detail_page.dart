@@ -77,11 +77,31 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
 
   void playNoteSound(String note) {
     if (noteController.isSoundEnabled.value) {
-      int? noteIndex = int.tryParse(note);
-      if (noteIndex != null && noteIndex >= 1 && noteIndex <= 7) {
-        player.play(AssetSource('sounds/note$noteIndex.wav'));
-      } else {
-        // Handle other cases or provide a default sound
+      for (int i = 0; i < note.length; i++) {
+        String char = note[i].toUpperCase();
+
+        if (char.compareTo('1') >= 0 && char.compareTo('7') <= 0) {
+          // If the character is between '1' and '7'
+          int noteIndex = int.parse(char);
+          player.play(AssetSource('sounds/note$noteIndex.wav'));
+        } else {
+          // Map keys 'Z' to 'M' to note1 to note7
+          final keyNoteMap = {
+            'Z': 1,
+            'X': 2,
+            'C': 3,
+            'V': 4,
+            'B': 5,
+            'N': 6,
+            'M': 7
+          };
+
+          if (keyNoteMap.containsKey(char)) {
+            int noteIndex = keyNoteMap[char]!;
+            player.play(AssetSource('sounds/note$noteIndex.wav'));
+          }
+          // You can add additional conditions for other cases if needed
+        }
       }
     }
   }
