@@ -16,6 +16,15 @@ class NoteDetailPage extends StatefulWidget {
 class _NoteDetailPageState extends State<NoteDetailPage> {
   final NoteController noteController = Get.find();
   final player = AudioPlayer();
+  final TextEditingController _noteController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.noteIndex != null) {
+      _noteController.text = noteController.notes[widget.noteIndex!];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +38,9 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
+              controller: _noteController,
               onChanged: (note) {
-                if (widget.noteIndex != null) {
-                  noteController.notes[widget.noteIndex!] = note;
-                } else {
-                  noteController.addNote(note);
-                }
-                playNoteSound(note);
+                // You can update the note in real-time if needed
               },
               decoration: const InputDecoration(
                 hintText: 'Enter your note...',
@@ -44,12 +49,16 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                if (widget.noteIndex != null) {
-                  noteController.deleteNote(widget.noteIndex!);
-                  Get.back();
-                }
+                playNoteSound(_noteController.text);
               },
-              child: const Text('Delete Note'),
+              child: const Text('Play Note Sound'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                saveNote();
+                Get.back();
+              },
+              child: const Text('Save Note'),
             ),
             RawKeyboardListener(
               focusNode: FocusNode(),
@@ -70,7 +79,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
     if (noteController.isSoundEnabled.value) {
       int? noteIndex = int.tryParse(note);
       if (noteIndex != null && noteIndex >= 1 && noteIndex <= 7) {
-        player.play(AssetSource('assets/sounds/note$noteIndex.wav'));
+        player.play(AssetSource('sounds/note$noteIndex.wav'));
       } else {
         // Handle other cases or provide a default sound
       }
@@ -82,6 +91,18 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
       if (['Z', 'X', 'C', 'V', 'B', 'N', 'M', '1', '2', '3', '4', '5', '6', '7']
           .contains(keyLabel)) {
         playNoteSound(keyLabel);
+      }
+    }
+  }
+
+  void saveNote() {
+    if (_noteController.text.isNotEmpty) {
+      if (widget.noteIndex != null) {
+        // Update existing note
+        noteController.notes[widget.noteIndex!] = _noteController.text;
+      } else {
+        // Add new note
+        noteController.addNote(_noteController.text);
       }
     }
   }

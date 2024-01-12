@@ -27,6 +27,12 @@ class NoteListPage extends StatelessWidget {
               onTap: () {
                 Get.to(NoteDetailPage(index));
               },
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  showDeleteConfirmationDialog(context, index);
+                },
+              ),
             );
           },
         ),
@@ -37,6 +43,33 @@ class NoteListPage extends StatelessWidget {
         },
         child: Icon(Icons.add),
       ),
+    );
+  }
+
+  void showDeleteConfirmationDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete this note?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                noteController.deleteNote(index);
+                Navigator.of(context).pop();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

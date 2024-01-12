@@ -16,4 +16,3 @@ class NoteController extends GetxController {
     isSoundEnabled.value = !isSoundEnabled.value;
   }
 }
-
