@@ -63,15 +63,16 @@ class NoteController extends GetxController {
           .map((doc) => doc['composition'] as String)
           .toList();
     } catch (e) {
+      // ignore: avoid_print
       print('Error getting compositions: $e');
       return [];
     }
   }
 
   void updateNotes(List<String> remoteNotes) {
-    // Update local notes with remote notes
+  
     notes.assignAll(remoteNotes);
-    // Save updated notes locally
+    
     saveNotes();
   }
 }

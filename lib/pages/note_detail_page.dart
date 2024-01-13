@@ -6,9 +6,10 @@ import 'package:musical_notebook/controller/note_controller.dart';
 class NoteDetailPage extends StatefulWidget {
   final int? noteIndex;
 
-  NoteDetailPage(this.noteIndex);
+  const NoteDetailPage(this.noteIndex, {super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _NoteDetailPageState createState() => _NoteDetailPageState();
 }
 
@@ -33,7 +34,9 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         title: const Text('Note Detail'),
         actions: [
           IconButton(
-            icon: isMuted ? Icon(Icons.volume_off) : Icon(Icons.volume_up),
+            icon: isMuted
+                ? const Icon(Icons.volume_off)
+                : const Icon(Icons.volume_up),
             onPressed: () {
               setState(() {
                 isMuted = !isMuted;
@@ -98,7 +101,6 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
           int noteIndex = keyNoteMap[char]!;
           player.play(AssetSource('sounds/note$noteIndex.wav'));
         }
-        // You can add additional conditions for other cases if needed
       }
     }
   }
@@ -106,14 +108,11 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   void saveNote() {
     if (_noteController.text.isNotEmpty) {
       if (widget.noteIndex != null) {
-        // Update existing note
         noteController.notes[widget.noteIndex!] = _noteController.text;
       } else {
-        // Add new note
         noteController.addNote(_noteController.text);
       }
 
-      // Save composition online
       saveCompositionOnline(_noteController.text);
     }
   }
