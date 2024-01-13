@@ -2,36 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musical_notebook/controller/note_controller.dart';
 import 'package:musical_notebook/pages/note_detail_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NoteListPage extends StatelessWidget {
   final NoteController noteController = Get.put(NoteController());
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Note List'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.volume_up),
-            onPressed: () => noteController.toggleSound(),
-          ),
-        ],
       ),
       body: Obx(
         () => ListView.builder(
           itemCount: noteController.notes.length,
           itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(noteController.notes[index]),
-              onTap: () {
-                Get.to(NoteDetailPage(index));
-              },
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  showDeleteConfirmationDialog(context, index);
+            return Card(
+              elevation: 2,
+              margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: ListTile(
+                title: Text(noteController.notes[index]),
+                onTap: () {
+                  Get.to(NoteDetailPage(index));
                 },
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    showDeleteConfirmationDialog(context, index);
+                  },
+                ),
               ),
             );
           },
@@ -61,7 +61,8 @@ class NoteListPage extends StatelessWidget {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                await deleteNoteFromFirebase(index);
                 noteController.deleteNote(index);
                 Navigator.of(context).pop();
               },
@@ -71,5 +72,17 @@ class NoteListPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> deleteNoteFromFirebase(int index) async {
+    try {
+      await _firestore
+          .collection('notes')
+          .doc(noteController.notes[index])
+          .delete();
+    } catch (e) {
+      print('Error deleting note from Firebase: $e');
+      // Handle error, show a message, etc.
+    }
   }
 }

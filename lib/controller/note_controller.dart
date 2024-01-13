@@ -1,11 +1,9 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NoteController extends GetxController {
-
-final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String compositionsCollection = 'compositions';
 
   var notes = <String>[].obs;
@@ -46,8 +44,7 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     notes.assignAll(prefs.getStringList(notesKey) ?? []);
   }
 
-
-   Future<void> saveCompositionOnline(String composition) async {
+  Future<void> saveCompositionOnline(String composition) async {
     try {
       await _firestore.collection(compositionsCollection).add({
         'composition': composition,
@@ -62,11 +59,19 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await _firestore.collection(compositionsCollection).get();
 
-      return querySnapshot.docs.map((doc) => doc['composition'] as String).toList();
+      return querySnapshot.docs
+          .map((doc) => doc['composition'] as String)
+          .toList();
     } catch (e) {
       print('Error getting compositions: $e');
       return [];
     }
   }
 
+  void updateNotes(List<String> remoteNotes) {
+    // Update local notes with remote notes
+    notes.assignAll(remoteNotes);
+    // Save updated notes locally
+    saveNotes();
+  }
 }

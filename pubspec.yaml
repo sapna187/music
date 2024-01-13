@@ -38,7 +38,7 @@ dependencies:
   audioplayers: ^1.0.1
   shared_preferences:
   cloud_firestore:
-  firebase_core: ^2.7.0
+  firebase_core: ^2.24.2
 
 dev_dependencies:
   flutter_test:

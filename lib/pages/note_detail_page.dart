@@ -1,6 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:musical_notebook/controller/note_controller.dart';
 
@@ -17,6 +16,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   final NoteController noteController = Get.find();
   final player = AudioPlayer();
   final TextEditingController _noteController = TextEditingController();
+  bool isMuted = false;
 
   @override
   void initState() {
@@ -31,6 +31,16 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Note Detail'),
+        actions: [
+          IconButton(
+            icon: isMuted ? Icon(Icons.volume_off) : Icon(Icons.volume_up),
+            onPressed: () {
+              setState(() {
+                isMuted = !isMuted;
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -40,7 +50,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
             TextField(
               controller: _noteController,
               onChanged: (note) {
-                // You can update the note in real-time if needed
+                playNoteSound(note);
               },
               decoration: const InputDecoration(
                 hintText: 'Enter your note...',
@@ -60,15 +70,6 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
               },
               child: const Text('Save Note'),
             ),
-            RawKeyboardListener(
-              focusNode: FocusNode(),
-              onKey: (RawKeyEvent event) {
-                if (event is RawKeyDownEvent) {
-                  handleKeyPress(event.logicalKey.keyLabel);
-                }
-              },
-              child: Container(),
-            ),
           ],
         ),
       ),
@@ -76,41 +77,28 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   }
 
   void playNoteSound(String note) {
-    if (noteController.isSoundEnabled.value) {
-      for (int i = 0; i < note.length; i++) {
-        String char = note[i].toUpperCase();
+    if (!isMuted && noteController.isSoundEnabled.value && note.isNotEmpty) {
+      String char = note[note.length - 1].toUpperCase();
 
-        if (char.compareTo('1') >= 0 && char.compareTo('7') <= 0) {
-          // If the character is between '1' and '7'
-          int noteIndex = int.parse(char);
+      if (char.compareTo('1') >= 0 && char.compareTo('7') <= 0) {
+        int noteIndex = int.parse(char);
+        player.play(AssetSource('sounds/note$noteIndex.wav'));
+      } else {
+        final keyNoteMap = {
+          'Z': 1,
+          'X': 2,
+          'C': 3,
+          'V': 4,
+          'B': 5,
+          'N': 6,
+          'M': 7
+        };
+
+        if (keyNoteMap.containsKey(char)) {
+          int noteIndex = keyNoteMap[char]!;
           player.play(AssetSource('sounds/note$noteIndex.wav'));
-        } else {
-          // Map keys 'Z' to 'M' to note1 to note7
-          final keyNoteMap = {
-            'Z': 1,
-            'X': 2,
-            'C': 3,
-            'V': 4,
-            'B': 5,
-            'N': 6,
-            'M': 7
-          };
-
-          if (keyNoteMap.containsKey(char)) {
-            int noteIndex = keyNoteMap[char]!;
-            player.play(AssetSource('sounds/note$noteIndex.wav'));
-          }
-          // You can add additional conditions for other cases if needed
         }
-      }
-    }
-  }
-
-  void handleKeyPress(String keyLabel) {
-    if (noteController.isSoundEnabled.value) {
-      if (['Z', 'X', 'C', 'V', 'B', 'N', 'M', '1', '2', '3', '4', '5', '6', '7']
-          .contains(keyLabel)) {
-        playNoteSound(keyLabel);
+        // You can add additional conditions for other cases if needed
       }
     }
   }
